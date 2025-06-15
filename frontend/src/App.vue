@@ -158,7 +158,7 @@ const filters = [
 
 // API Base URL - Replace with your Spring Boot backend URL
 // API Base URL
-const API_BASE_URL = 'https://website-fr-rewotechnology.onrender.com/api/todos'
+const API_BASE_URL = 'https://website-f-r-webtechnologie-1.onrender.com/api/todos'
 
 // Methods
 const fetchTodos = async () => {
@@ -226,5 +226,4 @@ const deleteTodo = async (id) => {
     console.error('Error:', error)
   }
 }
-
 </script>
