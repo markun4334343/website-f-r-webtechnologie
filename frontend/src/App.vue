@@ -157,96 +157,39 @@ const filters = [
 ]
 
 // API Base URL - Replace with your Spring Boot backend URL
-const API_BASE_URL = 'https://your-spring-boot-app.render.com/api'
-
-// Computed properties
-const filteredTodos = computed(() => {
-  switch (currentFilter.value) {
-    case 'active':
-      return todos.value.filter(todo => !todo.completed)
-    case 'completed':
-      return todos.value.filter(todo => todo.completed)
-    default:
-      return todos.value
-  }
-})
-
-const activeTodos = computed(() => todos.value.filter(todo => !todo.completed))
-const completedTodos = computed(() => todos.value.filter(todo => todo.completed))
-
-const completionPercentage = computed(() => {
-  if (todos.value.length === 0) return 0
-  return Math.round((completedTodos.value.length / todos.value.length) * 100)
-})
+// API Base URL
+const API_BASE_URL = 'https://website-fr-rewotechnology.onrender.com/api/todos'
 
 // Methods
 const fetchTodos = async () => {
   try {
-    // Replace with actual GET request to your Spring Boot backend
-    // const response = await fetch(`${API_BASE_URL}/todos`)
-    // const data = await response.json()
-    // todos.value = data
-
-    // Mock data for demonstration
-    const mockTodos = [
-      {
-        id: 1,
-        text: 'Complete the Spring Boot backend',
-        completed: true,
-        createdAt: new Date('2024-01-15')
-      },
-      {
-        id: 2,
-        text: 'Deploy frontend to Render',
-        completed: false,
-        createdAt: new Date('2024-01-16')
-      },
-      {
-        id: 3,
-        text: 'Test POST and GET routes',
-        completed: false,
-        createdAt: new Date('2024-01-17')
-      }
-    ]
-    todos.value = mockTodos
-    nextId.value = Math.max(...mockTodos.map(t => t.id)) + 1
+    const response = await fetch(API_BASE_URL)
+    if (!response.ok) throw new Error('Failed to fetch todos')
+    todos.value = await response.json()
   } catch (error) {
-    console.error('Error fetching todos:', error)
+    console.error('Error:', error)
   }
 }
 
 const addTodo = async () => {
   if (!newTodo.value.trim()) return
-
   isLoading.value = true
 
   try {
-    const todoData = {
-      text: newTodo.value.trim(),
-      completed: false,
-      createdAt: new Date()
-    }
-
-    // Replace with actual POST request to your Spring Boot backend
-    // const response = await fetch(`${API_BASE_URL}/todos`, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify(todoData)
-    // })
-    // const newTodoItem = await response.json()
-
-    // Mock POST response for demonstration
-    const newTodoItem = {
-      id: nextId.value++,
-      ...todoData
-    }
-
-    todos.value.unshift(newTodoItem)
+    const response = await fetch(API_BASE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: newTodo.value.trim(),
+        completed: false
+      })
+    })
+    if (!response.ok) throw new Error('Failed to add todo')
+    const data = await response.json()
+    todos.value.unshift(data)
     newTodo.value = ''
   } catch (error) {
-    console.error('Error adding todo:', error)
+    console.error('Error:', error)
   } finally {
     isLoading.value = false
   }
@@ -257,68 +200,29 @@ const toggleTodo = async (id) => {
     const todo = todos.value.find(t => t.id === id)
     if (!todo) return
 
-    // Replace with actual PUT request to your Spring Boot backend
-    // await fetch(`${API_BASE_URL}/todos/${id}`, {
-    //   method: 'PUT',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({ ...todo, completed: !todo.completed })
-    // })
-
-    // Mock update for demonstration
+    const response = await fetch(`${API_BASE_URL}/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...todo,
+        completed: !todo.completed
+      })
+    })
+    if (!response.ok) throw new Error('Failed to update todo')
     todo.completed = !todo.completed
   } catch (error) {
-    console.error('Error updating todo:', error)
+    console.error('Error:', error)
   }
 }
 
 const deleteTodo = async (id) => {
   try {
-    // Replace with actual DELETE request to your Spring Boot backend
-    // await fetch(`${API_BASE_URL}/todos/${id}`, {
-    //   method: 'DELETE'
-    // })
-
-    // Mock delete for demonstration
+    const response = await fetch(`${API_BASE_URL}/${id}`, {
+      method: 'DELETE'
+    })
+    if (!response.ok) throw new Error('Failed to delete todo')
     todos.value = todos.value.filter(todo => todo.id !== id)
   } catch (error) {
-    console.error('Error deleting todo:', error)
+    console.error('Error:', error)
   }
 }
-
-const clearCompleted = async () => {
-  try {
-    const completedIds = completedTodos.value.map(todo => todo.id)
-
-    // Replace with actual batch DELETE request to your Spring Boot backend
-    // await Promise.all(
-    //   completedIds.map(id =>
-    //     fetch(`${API_BASE_URL}/todos/${id}`, { method: 'DELETE' })
-    //   )
-    // )
-
-    // Mock batch delete for demonstration
-    todos.value = todos.value.filter(todo => !todo.completed)
-  } catch (error) {
-    console.error('Error clearing completed todos:', error)
-  }
-}
-
-const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  })
-}
-
-// Lifecycle
-onMounted(() => {
-  fetchTodos()
-})
-</script>
-
-<style scoped>
-/* Additional custom styles if needed */
-</style>
