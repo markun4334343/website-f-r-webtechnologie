@@ -1,7 +1,10 @@
 #!/bin/bash
 set -e  # Exit on error
-sudo apt-get update
-sudo apt-get install -y ncurses-bin  # Fixes tput error
-chmod +x gradlew
+
+# Set Java environment
 export JAVA_HOME=/usr/lib/jvm/temurin-17-jdk-amd64
+export PATH=$JAVA_HOME/bin:$PATH
+
+# Make gradlew executable and build
+chmod +x gradlew
 ./gradlew build --no-daemon
