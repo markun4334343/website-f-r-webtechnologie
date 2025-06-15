@@ -226,3 +226,5 @@ const deleteTodo = async (id) => {
     console.error('Error:', error)
   }
 }
+
+</script>
