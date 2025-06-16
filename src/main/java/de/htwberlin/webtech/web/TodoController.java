@@ -42,6 +42,11 @@ public class TodoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/")
+    public String home() {
+        return "Todo API is running! Access endpoints at /api/todos";
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTodo(@PathVariable Long id) {
         todos.removeIf(todo -> todo.getId().equals(id));
