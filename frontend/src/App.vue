@@ -139,15 +139,17 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { Plus, Check, CheckCircle, Trash2, Loader2 } from 'lucide-vue-next'
 
-// Reactive data
-const todos = ref([])
-const newTodo = ref('')
-const currentFilter = ref('all')
-const isLoading = ref(false)
-const nextId = ref(1)
+  import { ref } from 'vue'  // ← Essential import
+  import { Plus, Check, Trash2 } from 'lucide-vue-next'
+
+  // Reactive data (ONLY DECLARE ONCE)
+  const todos = ref([])          // Empty array
+  const newTodo = ref('')        // Empty string
+  const currentFilter = ref('all') // Default filter
+  const isLoading = ref(false)   // Loading state
+  const nextId = ref(1)          // Counter
+
 
 // Filter options
 const filters = [
@@ -156,9 +158,38 @@ const filters = [
   { key: 'completed', label: 'Completed' }
 ]
 
+
 // API Base URL - Replace with your Spring Boot backend URL
 // API Base URL
 const API_BASE_URL = 'https://website-f-r-webtechnologie-1.onrender.com/api/todos'
+
+
+
+// 3. Add this date formatter (with ISO string support)
+const formatDate = (date) => {
+  const dateObj = typeof date === 'string' ? new Date(date) : date
+  return dateObj.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  })
+}
+
+// 4. Update clearCompleted method
+const clearCompleted = async () => {
+  try {
+    await Promise.all(
+        completedTodos.value.map(todo =>
+            fetch(`${API_BASE_URL}/${todo.id}`, {
+              method: 'DELETE'
+            })
+        )
+    );
+    todos.value = todos.value.filter(todo => !todo.completed);
+  } catch (error) {
+    console.error('Error clearing completed todos:', error);
+  }
+}
 
 // Methods
 const fetchTodos = async () => {
