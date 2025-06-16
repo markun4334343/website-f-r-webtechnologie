@@ -1,5 +1,6 @@
 package de.htwberlin.webtech.web;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
@@ -42,11 +43,6 @@ public class TodoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/")
-    public String home() {
-        return "Todo API is running! Access endpoints at /api/todos";
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTodo(@PathVariable Long id) {
         todos.removeIf(todo -> todo.getId().equals(id));
@@ -54,6 +50,7 @@ public class TodoController {
     }
 }
 
+// Todo class
 class Todo {
     private Long id;
     private String text;
@@ -73,3 +70,4 @@ class Todo {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }
+

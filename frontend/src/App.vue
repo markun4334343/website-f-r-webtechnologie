@@ -139,17 +139,14 @@
 </template>
 
 <script setup>
+import { ref, computed, onMounted } from 'vue'
+import { Plus, Check, Trash2, CheckCircle, Loader2 } from 'lucide-vue-next'
 
-  import { ref } from 'vue'  // ← Essential import
-  import { Plus, Check, Trash2 } from 'lucide-vue-next'
-
-  // Reactive data (ONLY DECLARE ONCE)
-  const todos = ref([])          // Empty array
-  const newTodo = ref('')        // Empty string
-  const currentFilter = ref('all') // Default filter
-  const isLoading = ref(false)   // Loading state
-  const nextId = ref(1)          // Counter
-
+// Reactive data
+const todos = ref([])
+const newTodo = ref('')
+const currentFilter = ref('all')
+const isLoading = ref(false)
 
 // Filter options
 const filters = [
@@ -158,14 +155,28 @@ const filters = [
   { key: 'completed', label: 'Completed' }
 ]
 
-
-// API Base URL - Replace with your Spring Boot backend URL
 // API Base URL
 const API_BASE_URL = 'https://website-f-r-webtechnologie-1.onrender.com/api/todos'
 
+// Computed properties
+const activeTodos = computed(() => todos.value.filter(todo => !todo.completed))
+const completedTodos = computed(() => todos.value.filter(todo => todo.completed))
+const filteredTodos = computed(() => {
+  switch (currentFilter.value) {
+    case 'active':
+      return activeTodos.value
+    case 'completed':
+      return completedTodos.value
+    default:
+      return todos.value
+  }
+})
+const completionPercentage = computed(() => {
+  if (todos.value.length === 0) return 0
+  return Math.round((completedTodos.value.length / todos.value.length) * 100)
+})
 
-
-// 3. Add this date formatter (with ISO string support)
+// Date formatter
 const formatDate = (date) => {
   const dateObj = typeof date === 'string' ? new Date(date) : date
   return dateObj.toLocaleDateString('en-US', {
@@ -173,22 +184,6 @@ const formatDate = (date) => {
     day: 'numeric',
     year: 'numeric'
   })
-}
-
-// 4. Update clearCompleted method
-const clearCompleted = async () => {
-  try {
-    await Promise.all(
-        completedTodos.value.map(todo =>
-            fetch(`${API_BASE_URL}/${todo.id}`, {
-              method: 'DELETE'
-            })
-        )
-    );
-    todos.value = todos.value.filter(todo => !todo.completed);
-  } catch (error) {
-    console.error('Error clearing completed todos:', error);
-  }
 }
 
 // Methods
@@ -257,4 +252,24 @@ const deleteTodo = async (id) => {
     console.error('Error:', error)
   }
 }
+
+const clearCompleted = async () => {
+  try {
+    await Promise.all(
+        completedTodos.value.map(todo =>
+            fetch(`${API_BASE_URL}/${todo.id}`, {
+              method: 'DELETE'
+            })
+        )
+    )
+    todos.value = todos.value.filter(todo => !todo.completed)
+  } catch (error) {
+    console.error('Error clearing completed todos:', error)
+  }
+}
+
+// Fetch todos on component mount
+onMounted(() => {
+  fetchTodos()
+})
 </script>
