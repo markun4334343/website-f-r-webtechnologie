@@ -8,8 +8,10 @@ COPY gradle gradle
 COPY build.gradle .
 COPY settings.gradle .
 
-# Fix permissions and line endings (CRITICAL)
-RUN chmod +x gradlew && \
+# Install dos2unix and fix permissions
+RUN apt-get update && \
+    apt-get install -y dos2unix && \
+    chmod +x gradlew && \
     dos2unix gradlew && \
     ./gradlew --version
 
