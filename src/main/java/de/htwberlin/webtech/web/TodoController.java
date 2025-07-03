@@ -11,7 +11,10 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
 @RequestMapping("/api/todos")
-@CrossOrigin(origins = "*") // Enable CORS
+@CrossOrigin(origins = {
+        "https://website-f-r-webtechnologie.onrender.com",
+        "http://localhost:8080"  // Keep for local testing
+})
 public class TodoController {
 
     private final List<Todo> todos = new ArrayList<>();
