@@ -1,14 +1,27 @@
+# Build stage
 FROM eclipse-temurin:17-jdk AS builder
 WORKDIR /app
-COPY . .
+
+# First copy only the gradle files
+COPY gradlew .
+COPY gradle gradle
+COPY build.gradle .
+COPY settings.gradle .
+
+# Fix permissions and line endings (CRITICAL)
+RUN chmod +x gradlew && \
+    dos2unix gradlew && \
+    ./gradlew --version
+
+# Then copy source and build
+COPY src src
 RUN ./gradlew build -x test
 
+# Runtime stage
 FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=builder /app/build/libs/*.jar app.jar
 
-# Render-specific settings
+# Explicit port configuration for Render
 EXPOSE 8080
-HEALTHCHECK --interval=30s --timeout=3s \
-  CMD curl -f http://localhost:8080/actuator/health || exit 1
 CMD ["java", "-jar", "-Dserver.port=8080", "-Dserver.address=0.0.0.0", "app.jar"]
