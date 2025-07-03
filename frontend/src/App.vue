@@ -156,7 +156,7 @@ const filters = [
 ]
 
 // API Base URL
-const API_BASE_URL = 'https://website-f-r-webtechnologie-1.onrender.com/api/todos'
+const API_BASE_URL = 'https://website-f-r-webtechnologie.onrender.com/api/todos'
 
 // Computed properties
 const activeTodos = computed(() => todos.value.filter(todo => !todo.completed))
